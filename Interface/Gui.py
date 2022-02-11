@@ -5,18 +5,15 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 
-root = ttk.Window(themename="darkly")
 
-# frmBrowse = ttk.Frame(root, style='info', width=150, height=100)
-# frmBrowse.grid(row=0, column=0, padx=50, pady=50)
-# frmFln = ttk.Frame(root, bootstyle="light", width=150, height=35)
+root = ttk.Window(themename="darkly")
 
 btnBrowse = ttk.Button(root, text="Browse", bootstyle="default", width=12)
 btnBrowse.grid(row=0, column=0, padx=(50,20), pady=(50,25))
 
-folderName = tk.StringVar(value='Folder name')
+folderName = tk.StringVar(value='None')
 
-lblFolderName = ttk.Label(root, textvariable=folderName, bootstyle="default", justify='left')
+lblFolderName = ttk.Label(root, text=f'Folder name : {folderName.get()}', bootstyle="default", justify='left')
 lblFolderName.grid(row=0, column=1, columnspan=2, padx=(20,50), pady=(50,25))
 
 
@@ -51,8 +48,10 @@ btnMenuOrder["menu"] = menuOrder
 frmEraseSymbol = ttk.Frame(root, bootstyle="default")
 frmEraseSymbol.grid(row=2, column=1, padx=(30,50), pady=(0,25))
 
-checkbuttonEraseSymbol = ttk.Checkbutton(frmEraseSymbol, bootstyle="secondary")
-checkbuttonEraseSymbol.grid(row=0, column=0, padx=(20,5), pady=25)
+chkEraseSymbol = tk.StringVar()
+
+chkbuttonEraseSymbol = ttk.Checkbutton(frmEraseSymbol, bootstyle="secondary", variable=chkEraseSymbol)
+chkbuttonEraseSymbol.grid(row=0, column=0, padx=(20,5), pady=25)
 
 lblEraseSymbol = ttk.Label(frmEraseSymbol, text="Erase symbol", bootstyle="default", justify='left')
 lblEraseSymbol.grid(row=0, column=1, padx=(5,20), pady=25)
