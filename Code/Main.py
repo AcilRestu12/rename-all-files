@@ -1,13 +1,15 @@
+from ast import Pass
 from cgitb import text
+from distutils.log import error
 from importlib.resources import path
+from re import I
 import tkinter as tk
 from turtle import width
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import os
 from tkinter import filedialog
-
-
+from tkinter import messagebox
 
 
 
@@ -32,6 +34,7 @@ def btnRenameClicked():
     
     pathFolder += '/'
     num = 1
+    sumFiles.set(0)
     
     for i, filename in enumerate(os.listdir(pathFolder)):
         # print(f'filename : {filename}')
@@ -43,24 +46,51 @@ def btnRenameClicked():
         # print(f'Nama file : {listFile[0]}')
         # print(f'Ekstensi file : {listFile[1]}\n---------')
 
-        if inputNewFln.get() == '':
-            inputNewFln.configure(textvariable=oldName)
+        if inputNewFln.get() == '/oldname':
+            fln.set(oldName)
 
+        if num > 1 and fln.get() == '':
+            fln.set('/oldname')
+            
+        if fln.get() == '/oldname':
+            fln.set(oldName)
+                        
         if chkEraseSymbol.get() == '1':
             if choiceOrder.get() == 'Prefix':
                 newName = f'{num} {inputNewFln.get()}'
             elif choiceOrder.get() == 'Suffix':
                 newName = f'{inputNewFln.get()} {num}'
+            elif choiceOrder.get() == 'No order':
+                # newName = f'{inputNewFln.get()}'
+                messagebox.showerror('Error', f'Please select position order!')
         else:
             if choiceOrder.get() == 'Prefix':
                 newName = f'{num}-{inputNewFln.get()}'
             elif choiceOrder.get() == 'Suffix':
                 newName = f'{inputNewFln.get()}-{num}'
+            elif choiceOrder.get() == 'No order':
+                messagebox.showerror('Error', f'Please select position order!')
             
         newFilename = newName + '.' + extensionFile
         
-        os.rename(pathFolder + filename, pathFolder + newFilename)
-        print(f'newFilename : {newFilename}\n')
+        try:
+            os.rename(pathFolder + filename, pathFolder + newFilename)
+            print(f'newFilename : {newFilename}\n')
+            sumFiles.set(int(sumFiles.get())+1)
+            if inputNewFln.get() == '/oldname':
+                fln.set('')
+        except error:
+            messagebox.showerror('Error', f'{oldName} was unsuccessfully renamed!')
+            print(error +'\n')
+        
+        if int(sumFiles.get()) < 0:
+            sumFiles.set(0)
+        
+        if int(sumFiles.get()) == 1 or int(sumFiles.get()) == 0:
+            report.set(f"{sumFiles.get()} file was successfully renamed")
+        elif int(sumFiles.get()) > 1:
+            report.set(f"{sumFiles.get()} files was successfully renamed")    
+                    
         num += 1
 
 
@@ -83,7 +113,7 @@ if __name__ == '__main__':
     frmNewFln = ttk.Frame(root, bootstyle="default")
     frmNewFln.grid(row=1, column=0, padx=(50,30), pady=25)
 
-    fln = tk.StringVar(value='File')
+    fln = tk.StringVar()
 
     lblNewFln = ttk.Label(frmNewFln, text="Input new file name : ", bootstyle="default", justify='left')
     lblNewFln.grid(row=0, column=0, padx=(20,5), pady=25)
@@ -91,7 +121,7 @@ if __name__ == '__main__':
     inputNewFln = ttk.Entry(frmNewFln, bootstyle="default", width=18, textvariable=fln)
     inputNewFln.grid(row=0, column=1, padx=(5,20), pady=25)
 
-    btnRename = ttk.Button(root, text="Rename", bootstyle="success", width=12)
+    btnRename = ttk.Button(root, text="Rename", bootstyle="success", width=12, command=btnRenameClicked)
     btnRename.grid(row=1, column=1, padx=(30,50), pady=25)
 
 
@@ -121,17 +151,9 @@ if __name__ == '__main__':
 
 
     sumFiles = tk.StringVar(value=0)
-    lblReport = ttk.Label(root, text=f"{sumFiles.get()} file was successfully renamed", bootstyle="default", justify='left')
+    report = tk.StringVar(value='0 file')
+    lblReport = ttk.Label(root, textvariable=report, bootstyle="default", justify='left')
     lblReport.grid(row=3, column=0, columnspan=4, padx=50, pady=(30,50))
-
-    if int(sumFiles.get()) < 0:
-        sumFiles.set(0)
-
-    if int(sumFiles.get()) == 1 or int(sumFiles.get()) == 0:
-        lblReport.configure(text=f"{sumFiles.get()} file was successfully renamed")
-    elif int(sumFiles.get()) > 1:
-        lblReport.configure(text=f"{sumFiles.get()} files was successfully renamed")
-
 
 
     root.title("Rename All Files")
