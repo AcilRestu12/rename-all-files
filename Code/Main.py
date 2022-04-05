@@ -1,15 +1,18 @@
-from ast import Pass
-from cgitb import text
-from distutils.log import error
-from importlib.resources import path
-from re import I
 import tkinter as tk
-from turtle import width
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
+from distutils.log import error
 import os
 from tkinter import filedialog
 from tkinter import messagebox
+
+
+def getFileName(fullName):
+    listFile = (fullName.split('.'))
+    fileName = listFile[0]
+    extFile = listFile[1]
+    return fileName, extFile
+
 
 
 
@@ -37,29 +40,24 @@ def btnRenameClicked():
     sumFiles.set(0)
     
     for i, filename in enumerate(os.listdir(pathFolder)):
-        # print(f'filename : {filename}')
-        listFile = (filename.split('.'))
-        oldName = listFile[0]
-        extensionFile = listFile[1]
-        
-        # print(f'listFile : {listFile}')
-        # print(f'Nama file : {listFile[0]}')
-        # print(f'Ekstensi file : {listFile[1]}\n---------')
+        oldName, extFile = getFileName(filename)
+        print('old name : ' + oldName)
+        sameName = False
 
-        if inputNewFln.get() == '/oldname':
+        # Jika input new file name-nya : $oldname
+        if inputNewFln.get() == '$oldname':
+            sameName = True
             fln.set(oldName)
-
-        if num > 1 and fln.get() == '':
-            fln.set('/oldname')
-            
-        if fln.get() == '/oldname':
-            fln.set(oldName)
-                        
+                       
+        # Apabila checkbutton Erase symbol dicentang
         if chkEraseSymbol.get() == '1':
             if choiceOrder.get() == 'Prefix':
                 newName = f'{num} {inputNewFln.get()}'
             elif choiceOrder.get() == 'Suffix':
                 newName = f'{inputNewFln.get()} {num}'
+            elif choiceOrder.get() == 'Custom':
+                newName = f'{inputNewFln.get()}'
+                newName = newName.replace('$order', str(num))
             elif choiceOrder.get() == 'No order':
                 # newName = f'{inputNewFln.get()}'
                 messagebox.showerror('Error', f'Please select position order!')
@@ -68,17 +66,22 @@ def btnRenameClicked():
                 newName = f'{num}-{inputNewFln.get()}'
             elif choiceOrder.get() == 'Suffix':
                 newName = f'{inputNewFln.get()}-{num}'
+            elif choiceOrder.get() == 'Custom':
+                newName = f'{inputNewFln.get()}'
+                newName = newName.replace('$order', str(num))
             elif choiceOrder.get() == 'No order':
                 messagebox.showerror('Error', f'Please select position order!')
             
-        newFilename = newName + '.' + extensionFile
+        newFilename = newName + '.' + extFile
         
         try:
             os.rename(pathFolder + filename, pathFolder + newFilename)
             print(f'newFilename : {newFilename}\n')
             sumFiles.set(int(sumFiles.get())+1)
-            if inputNewFln.get() == '/oldname':
-                fln.set('')
+
+            # Mereset fln menjadi $oldname
+            if sameName:
+                fln.set('$oldname')     
         except error:
             messagebox.showerror('Error', f'{oldName} was unsuccessfully renamed!')
             print(error +'\n')
@@ -129,7 +132,7 @@ if __name__ == '__main__':
     btnMenuOrder.grid(row=2, column=0, padx=(50,30), pady=(0,25))
 
     menuOrder = tk.Menu(btnMenuOrder, tearoff=0)
-    posOrders = ('No order', 'Prefix', 'Suffix')
+    posOrders = ('No order', 'Prefix', 'Suffix', 'Custom')
     choiceOrder = tk.StringVar()
     for posOrder in posOrders:
         menuOrder.add_radiobutton(
