@@ -1,7 +1,7 @@
 # rename-all-files
 Project to rename all files in a folder
 
----
+<br>
 
 ## How to Use This Program
 1. Click Browse button.
