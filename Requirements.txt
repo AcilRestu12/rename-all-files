@@ -1,0 +1,6 @@
+Package      Version
+------------ -------
+Pillow       9.0.1  
+pip          22.0.4 
+setuptools   57.4.0 
+ttkbootstrap 1.6.0 

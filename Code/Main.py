@@ -14,13 +14,11 @@ def getFileName(fullName):
     return fileName, extFile
 
 
-
-
 def btnBrowseClicked():
     global pathFolder
     
     pathFolder = filedialog.askdirectory(initialdir=os.getcwd(), title="Select Folder")
-    print(f'pathFolder : {pathFolder}\n')
+    # print(f'pathFolder : {pathFolder}\n')
     
     folderName.set(pathFolder.split('/')[-1])
     if pathFolder == '':
@@ -29,7 +27,7 @@ def btnBrowseClicked():
         folderName.set(pathFolder.split('/')[-1])
         
     lblFolderName.configure(text=f'Folder name : {folderName.get()}')
-    print(f'folderName : {folderName.get()}\n')
+    # print(f'folderName : {folderName.get()}\n')
 
         
 def btnRenameClicked():
@@ -41,7 +39,7 @@ def btnRenameClicked():
     
     for i, filename in enumerate(os.listdir(pathFolder)):
         oldName, extFile = getFileName(filename)
-        print('old name : ' + oldName)
+        # print('old name : ' + oldName)
         sameName = False
 
         # Jika input new file name-nya : $oldname
@@ -59,7 +57,6 @@ def btnRenameClicked():
                 newName = f'{inputNewFln.get()}'
                 newName = newName.replace('$order', str(num))
             elif choiceOrder.get() == 'No order':
-                # newName = f'{inputNewFln.get()}'
                 messagebox.showerror('Error', f'Please select position order!')
         else:
             if choiceOrder.get() == 'Prefix':
@@ -76,7 +73,7 @@ def btnRenameClicked():
         
         try:
             os.rename(pathFolder + filename, pathFolder + newFilename)
-            print(f'newFilename : {newFilename}\n')
+            # print(f'newFilename : {newFilename}\n')
             sumFiles.set(int(sumFiles.get())+1)
 
             # Mereset fln menjadi $oldname
@@ -84,7 +81,7 @@ def btnRenameClicked():
                 fln.set('$oldname')     
         except error:
             messagebox.showerror('Error', f'{oldName} was unsuccessfully renamed!')
-            print(error +'\n')
+            # print(error +'\n')
         
         if int(sumFiles.get()) < 0:
             sumFiles.set(0)
