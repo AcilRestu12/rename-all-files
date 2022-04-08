@@ -11,6 +11,8 @@ Project to rename all files in a folder
 5. If you want to use the `-` sign in your file name, then uncheck the `Erase symbol` button. But if you don't want to use that symbol, then check the `Erase symbol` button.
 6. After that, click the `Rename` button.
 
+<br>
+
 ## How It Work ?
 Simple enough. The program just reads the files in the selected folder, then it renames them one by one with the desired name and the selected order.
 
