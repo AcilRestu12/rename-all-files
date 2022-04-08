@@ -13,85 +13,118 @@ def getFileName(fullName):
     extFile = listFile[1]
     return fileName, extFile
 
+def showError(message):
+    messagebox.showerror('Error', f'{message}')
+    report.set(f"0 file")    
+
+
 
 def btnBrowseClicked():
     global pathFolder
     
     pathFolder = filedialog.askdirectory(initialdir=os.getcwd(), title="Select Folder")
-    # print(f'pathFolder : {pathFolder}\n')
+    print(f'pathFolder : {pathFolder}\n')
     
-    folderName.set(pathFolder.split('/')[-1])
+    # Apabila path folder-nya kosong
     if pathFolder == '':
-        folderName.set('None')
+        folderName.set(None)
     else: 
         folderName.set(pathFolder.split('/')[-1])
         
     lblFolderName.configure(text=f'Folder name : {folderName.get()}')
-    # print(f'folderName : {folderName.get()}\n')
+    print(f'folderName : {folderName.get()}\n')
 
         
 def btnRenameClicked():
     global pathFolder
+    print(f'pathFolder : {pathFolder}\n')
     
-    pathFolder += '/'
-    num = 1
-    sumFiles.set(0)
-    
-    for i, filename in enumerate(os.listdir(pathFolder)):
-        oldName, extFile = getFileName(filename)
-        # print('old name : ' + oldName)
-        sameName = False
-
-        # Jika input new file name-nya : $oldname
-        if inputNewFln.get() == '$oldname':
-            sameName = True
-            fln.set(oldName)
-                       
-        # Apabila checkbutton Erase symbol dicentang
-        if chkEraseSymbol.get() == '1':
-            if choiceOrder.get() == 'Prefix':
-                newName = f'{num} {inputNewFln.get()}'
-            elif choiceOrder.get() == 'Suffix':
-                newName = f'{inputNewFln.get()} {num}'
-            elif choiceOrder.get() == 'Custom':
-                newName = f'{inputNewFln.get()}'
-                newName = newName.replace('$order', str(num))
-            elif choiceOrder.get() == 'No order':
-                messagebox.showerror('Error', f'Please select position order!')
-        else:
-            if choiceOrder.get() == 'Prefix':
-                newName = f'{num}-{inputNewFln.get()}'
-            elif choiceOrder.get() == 'Suffix':
-                newName = f'{inputNewFln.get()}-{num}'
-            elif choiceOrder.get() == 'Custom':
-                newName = f'{inputNewFln.get()}'
-                newName = newName.replace('$order', str(num))
-            elif choiceOrder.get() == 'No order':
-                messagebox.showerror('Error', f'Please select position order!')
+    # Mengecek apakah path foldernya sudah ada belum
+    if pathFolder == None or len(pathFolder) == 0:
+        showError('Please select the folder!')
+    elif len(pathFolder) > 0:
+        pathFolder += '/'
+        num = 1
+        askEmptyNewFln = None
+        sumFiles.set(0)
+        
+        # Apabila input new file name kosong
+        if inputNewFln.get() =='':
+            askEmptyNewFln = messagebox.askyesno('Are You Sure?', 'Your input new file name is empty. Are you sure to empty it?')
+        
+        for i, filename in enumerate(os.listdir(pathFolder)):
+            oldName, extFile = getFileName(filename)
+            print('old name : ' + oldName)
+            sameName = False
             
-        newFilename = newName + '.' + extFile
-        
-        try:
-            os.rename(pathFolder + filename, pathFolder + newFilename)
-            # print(f'newFilename : {newFilename}\n')
-            sumFiles.set(int(sumFiles.get())+1)
+            # Apabila position order 'No order'
+            if choiceOrder.get() == 'No order':
+                showError('Please select position order!')
+                break
+            
+            # Apabila position order 'Custom'
+            if choiceOrder.get() == 'Custom':
+                if inputNewFln.get().find('$order') >= 0:
+                    newName = f'{inputNewFln.get()}'
+                    newName = newName.replace('$order', str(num))
+                else:
+                    showError('Please input $order for the order!')
+                    break
+            
+            # Apabila input new file name kosong
+            if askEmptyNewFln == 1:            
+                pass
+            elif askEmptyNewFln == 0:
+                report.set(f"0 file")    
+                break
 
-            # Mereset fln menjadi $oldname
-            if sameName:
-                fln.set('$oldname')     
-        except error:
-            messagebox.showerror('Error', f'{oldName} was unsuccessfully renamed!')
-            # print(error +'\n')
-        
-        if int(sumFiles.get()) < 0:
-            sumFiles.set(0)
-        
-        if int(sumFiles.get()) == 1 or int(sumFiles.get()) == 0:
-            report.set(f"{sumFiles.get()} file was successfully renamed")
-        elif int(sumFiles.get()) > 1:
-            report.set(f"{sumFiles.get()} files was successfully renamed")    
-                    
-        num += 1
+            # Jika input new file name-nya : $oldname
+            if inputNewFln.get() == '$oldname':
+                sameName = True
+                fln.set(oldName)
+                
+
+            # Apabila checkbutton Erase symbol dicentang
+            if chkEraseSymbol.get() == '1':
+                if choiceOrder.get() == 'Prefix':
+                    newName = f'{num} {inputNewFln.get()}'
+                elif choiceOrder.get() == 'Suffix':
+                    newName = f'{inputNewFln.get()} {num}'
+                else:
+                    pass
+            else:
+                if choiceOrder.get() == 'Prefix':
+                    newName = f'{num}-{inputNewFln.get()}'
+                elif choiceOrder.get() == 'Suffix':
+                    newName = f'{inputNewFln.get()}-{num}'
+                else:
+                    pass
+                
+            newFilename = newName + '.' + extFile
+            
+            try:
+                os.rename(pathFolder + filename, pathFolder + newFilename)
+                print(f'newFilename : {newFilename}\n')
+                sumFiles.set(int(sumFiles.get())+1)
+
+                # Mereset fln menjadi $oldname
+                if sameName:
+                    fln.set('$oldname')     
+            except error:
+                messagebox.showerror('Error', f'{oldName} was unsuccessfully renamed!')
+                print(error +'\n')
+                break
+            
+            # Apabila jumlah file-nya kurang dari 0
+            if int(sumFiles.get()) < 0:
+                sumFiles.set(0)
+            
+            if int(sumFiles.get()) == 1 or int(sumFiles.get()) == 0:
+                report.set(f"{sumFiles.get()} file was successfully renamed")
+            elif int(sumFiles.get()) > 1:
+                report.set(f"{sumFiles.get()} files was successfully renamed")    
+                        
+            num += 1
 
 
 
@@ -130,7 +163,7 @@ if __name__ == '__main__':
 
     menuOrder = tk.Menu(btnMenuOrder, tearoff=0)
     posOrders = ('No order', 'Prefix', 'Suffix', 'Custom')
-    choiceOrder = tk.StringVar()
+    choiceOrder = tk.StringVar(value='No order')
     for posOrder in posOrders:
         menuOrder.add_radiobutton(
             label=posOrder,
